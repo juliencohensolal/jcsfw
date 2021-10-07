@@ -52,35 +52,18 @@ def get_balanced_weights(train_dataset):
 
 ### TFRECORDS ###
 
-def load_tfrecords(conf, conf_proj, phase):
-    if phase == "train":
-        tfrecords_path = conf_proj.train_path + "*.tfrec"
-        filenames = tf.io.gfile.glob(tfrecords_path)
-        dataset, n_images = load_tfrecords_from_filenames(conf, conf_proj, filenames, phase, labeled=True)
-    elif phase == "val":
-        tfrecords_path = conf_proj.val_path + "*.tfrec"
-        filenames = tf.io.gfile.glob(tfrecords_path)
-        dataset, n_images = load_tfrecords_from_filenames(conf, conf_proj, filenames, phase, labeled=True)
-    else:
-        tfrecords_path = conf_proj.test_path + "*.tfrec"
-        filenames = tf.io.gfile.glob(tfrecords_path)
-        dataset, n_images = load_tfrecords_from_filenames(conf, conf_proj, filenames, phase, labeled=False)
-    LOG.info("tfrecords_path : " + str(tfrecords_path))
-
-    return dataset, n_images
-
-
-def load_tfrecords_from_filenames(conf, conf_proj, filenames, phase, labeled):
+def load_tfrecords_from_filenames(conf, conf_proj, filenames, phase, labeled=True, ordered=False):
     # Count data
     n_images = count_tfrecords_items(filenames)
     LOG.info("Number of " + phase + " images : " + str(n_images))
 
     # Automatically interleaves reads from multiple files
     dataset = tf.data.TFRecordDataset(filenames, num_parallel_reads=AUTO)
-
+    
     # Uses data as soon as it streams in, rather than in its original order, increases speed
     ignore_order = tf.data.Options()
-    ignore_order.experimental_deterministic = False
+    if not ordered:
+        ignore_order.experimental_deterministic = False
     dataset = dataset.with_options(ignore_order)
     if labeled:
         dataset = dataset.map(lambda x: read_labeled_tfrecord(
@@ -88,7 +71,6 @@ def load_tfrecords_from_filenames(conf, conf_proj, filenames, phase, labeled):
     else:
         dataset = dataset.map(lambda x: read_unlabeled_tfrecord(
             x, conf.img_size, conf.channels, conf_proj), num_parallel_calls=AUTO)
-
     return dataset, n_images
 
 
@@ -130,22 +112,22 @@ def decode_image(image_data, img_size, channels):
 
 ### CSV ###
 
-def load_csv(conf_proj, verbose=True):
+'''def load_csv(conf_proj, verbose=True):
     csvpath = "../_data/" + conf_proj.project + "/train.csv"
     train = pd.read_csv(csvpath)
     if verbose:
         LOG.info("Train dimensions : " + str(train.shape))
         LOG.info(train.head(2))
-    return train
+    return train'''
 
 
-def create_img_dataset(df, column_files, column_labels):
+'''def create_img_dataset(df, column_files, column_labels):
     img_dataset = tf.data.Dataset.from_tensor_slices((df[column_files].values, df[column_labels].values))
     img_dataset = img_dataset.map(load_image_and_label_from_path, num_parallel_calls=AUTO)
-    return img_dataset
+    return img_dataset'''
 
 
-def load_image_and_label_from_path(image_path, label):
+'''def load_image_and_label_from_path(image_path, label):
     img = tf.io.read_file(image_path)
     img = tf.image.decode_jpeg(img, channels=3)
-    return img, label
+    return img, label'''

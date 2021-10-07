@@ -1,5 +1,4 @@
 from argparse import ArgumentParser
-import os
 import sys
 from time import time
 
@@ -12,9 +11,6 @@ from utils import c_logging, config, data, network_handler, startup
 
 
 LOG = c_logging.getLogger(__name__)
-
-# Reduce Matplotlib log level
-c_logging.getLogger("matplotlib").setLevel(20)
 
 
 def parse_args():
@@ -55,14 +51,11 @@ if __name__ == '__main__' :
     config.save_config(
         experiment_dir_train, "cfg_proj_" + args.project + ".yml", experiment_dir, suffix="_pred")
 
-    # Load dataset
-    LOG.info("Load dataset")
-    if conf_proj_train.tfrecords:
-        LOG.info("TFRecords data format")
-        test_dataset, nb_test_images = data.load_tfrecords(conf_train, conf_proj_train, "test")
-    else:
-        LOG.info("CSV data format - NOT HANDLED")
-        sys.exit()
+    # Load test dataset
+    LOG.info("Load test dataset")
+    test_filenames = tf.io.gfile.glob(conf_proj_train.test_path + "*.tfrec")
+    test_dataset, n_test_images = data.load_tfrecords_from_filenames(
+            conf_train, conf_proj_train, test_filenames, "test", labeled=False, ordered=True)
 
     # Get batches
     LOG.info("Get batches")
@@ -91,7 +84,7 @@ if __name__ == '__main__' :
     # Load pretrained weights
     LOG.info("Load pretrained weights")
     weights = ""
-    checkpoint_dir = experiment_dir_train + "checkpoints/"
+    checkpoint_dir = experiment_dir_train + "checkpoints/fold_0/"
     weights = tf.train.latest_checkpoint(checkpoint_dir)
     LOG.info("Weights : " + weights)
     model.load_weights(weights)
@@ -99,7 +92,7 @@ if __name__ == '__main__' :
     # Get image IDs from test set
     LOG.info("Get image IDs from test set")
     test_ids_ds = test_batches.map(lambda img, idnum: idnum).unbatch()
-    test_ids = next(iter(test_ids_ds.batch(nb_test_images))).numpy().astype('U')
+    test_ids = next(iter(test_ids_ds.batch(n_test_images))).numpy().astype('U')
 
     # Predict test images
     LOG.info("Predict test images")
