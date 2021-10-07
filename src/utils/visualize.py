@@ -1,5 +1,7 @@
 import math
 
+import numpy as np
+
 from matplotlib import pyplot as plt
 
 import utils.c_logging as c_logging
@@ -10,7 +12,7 @@ LOG = c_logging.getLogger(__name__)
 def display_one_image(image, title, subplot, titlesize=16):
     plt.subplot(*subplot)
     plt.axis('off')
-    plt.imshow(image)
+    plt.imshow(np.clip(image, 0, 1))
     if len(title) > 0:
         plt.title(
             title, fontsize=int(titlesize), color='black', fontdict={'verticalalignment':'center'}, 
