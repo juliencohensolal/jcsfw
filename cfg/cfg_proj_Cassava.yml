@@ -1,0 +1,17 @@
+# Experiment
+project: "Cassava"
+task: "classify"
+
+# Data
+train_path: "../_data/Cassava/train_tfrecords/"
+val_path: ""
+test_path: "../_data/Cassava/test_tfrecords/"
+tfrecords: True
+n_classes: 5
+tfrec_img: "image"
+tfrec_class: "target"
+
+# Base training values
+#loss: "SparseCategoricalCrossentropy"
+#metrics: "SparseCategoricalAccuracy"
+#img_size: 512

@@ -1,0 +1,16 @@
+# Experiment
+project: "Flowers"
+task: "classify"
+
+# Data
+train_path: "../_data/Flowers/tfrecords-jpeg-224x224/train/"
+val_path: "../_data/Flowers/tfrecords-jpeg-224x224/val/"
+test_path: "../_data/Flowers/tfrecords-jpeg-224x224/test/"
+tfrecords: True
+n_classes: 104
+tfrec_img: "image"
+tfrec_class: "class"
+
+# Base training values
+#loss: "SparseCategoricalCrossentropy"
+#metrics: "SparseCategoricalAccuracy"
