@@ -3,6 +3,7 @@ import os
 import sys
 from time import time
 
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold, train_test_split
 from sklearn.utils import shuffle
@@ -69,8 +70,8 @@ if __name__ == '__main__' :
     LOG.info("Start cross-validation")
     kfold = KFold(conf.n_folds, shuffle=True, random_state=conf.seed)
     for fold_idx, (train_idx, val_idx) in enumerate(kfold.split(train_filenames)):
-        LOG.info("========== FOLD #" + str(fold_idx))
-        print("========== FOLD #" + str(fold_idx))
+        LOG.info("========== FOLD #" + str(fold_idx) + " ==========")
+        print("========== FOLD #" + str(fold_idx) + " ==========")
 
         # Split dataset into train and val
         LOG.info("Split dataset into train and val")
@@ -82,13 +83,13 @@ if __name__ == '__main__' :
             conf, conf_proj, fold_val_filenames, "val", labeled=True, ordered=True)
 
         # Add augmentations
-        LOG.info("Add augmentations")
+        LOG.debug("Add augmentations")
         train_dataset = train_dataset.map(
             lambda image, label: augmentations.add_augmentations(image, label, conf), num_parallel_calls=AUTO)
 
         if conf.balanced_weights:
             # Get balanced weights
-            LOG.info("Get balanced weights")
+            LOG.debug("Get balanced weights")
             balanced_weights = data.get_balanced_weights(train_dataset)
 
         # The training dataset must repeat for several epochs
@@ -122,7 +123,7 @@ if __name__ == '__main__' :
 
         # Save first augmented images
         if conf.nb_saved_augmented_img > 0:
-            LOG.info("Save first augmented images")
+            LOG.debug("Save first augmented images")
             first_batch = next(iter(train_batches.unbatch().batch(conf.nb_saved_augmented_img)))
             visualize.save_first_images(experiment_dir, first_batch)
 
@@ -131,7 +132,7 @@ if __name__ == '__main__' :
         x, inputs, nb_layers = network_handler.get_base_model(conf)
 
         # Add head
-        LOG.info("Add head")
+        LOG.debug("Add head")
         if conf_proj.project == "Cassava":
             model = cassava.add_classif_head(conf, conf_proj, x, inputs)
         elif conf_proj.project == "Flowers":
@@ -174,7 +175,7 @@ if __name__ == '__main__' :
                     steps_per_epoch=n_train_images//conf.batch_size)
 
         # Unfreeze layers if needed
-        LOG.info("Unfreeze layers if needed")
+        LOG.debug("Unfreeze layers if needed")
         model = network_handler.unfreeze(conf, model, nb_layers)
 
         # Compile model
@@ -189,7 +190,7 @@ if __name__ == '__main__' :
         # Set up early stopping
         callbacks = []
         if conf.early_stopping_epochs > 0:
-            LOG.info("Set up early stopping")
+            LOG.debug("Set up early stopping")
             es_callback = tf.keras.callbacks.EarlyStopping(
                 monitor='val_loss', patience=conf.early_stopping_epochs, 
                 restore_best_weights=conf.restore_best_after_training)
@@ -197,7 +198,7 @@ if __name__ == '__main__' :
 
         # Set up learning rate
         if conf.lr is not None:
-            LOG.info("Set up learning rate")
+            LOG.debug("Set up learning rate")
             lr = lr_handler.get_learning_rate(conf)
             if lr is None:
                 sys.exit()
@@ -206,7 +207,7 @@ if __name__ == '__main__' :
 
         # Plug to Tensorboard
         if conf.tensorboard:
-            LOG.info("Plug Tensorboard")
+            LOG.debug("Plug Tensorboard")
             tensorboard_dir = experiment_dir + "tensorboard/fold_" + str(fold_idx) + "/"
             os.makedirs(tensorboard_dir)
             tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=tensorboard_dir)
@@ -214,7 +215,7 @@ if __name__ == '__main__' :
 
         # Set up checkpoints
         if conf.checkpoints:
-            LOG.info("Set up checkpoints")
+            LOG.debug("Set up checkpoints")
             checkpoint_dir = experiment_dir + "checkpoints/fold_" + str(fold_idx) + "/"
             os.makedirs(checkpoint_dir)
             cp_callback = tf.keras.callbacks.ModelCheckpoint(
@@ -241,6 +242,10 @@ if __name__ == '__main__' :
                 epochs=conf.epochs, 
                 steps_per_epoch=n_train_images//conf.batch_size, 
                 callbacks=callbacks)
+
+        # Log fold results
+        for key, value in history.history.items():
+            LOG.info(key + " " + str(np.round(value, 5)))
 
         if conf.first_fold_only:
             break
