@@ -1,8 +1,11 @@
 # log_level : 50=CRITICAL, 40=ERROR, 30=WARNING, 20=INFO, 10=DEBUG, 0=NOTSET
 log_level: 20
 
-# Experiment
+# Startup
+mixed_precision: True
+path_to_cuda: 'C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.4'
 seed: 42
+xla: True
 
 # Display
 model_summary: False

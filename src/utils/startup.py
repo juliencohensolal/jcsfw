@@ -36,3 +36,8 @@ def set_mixed_precision():
     mixed_precision.set_global_policy(policy)
     LOG.info('Compute dtype: %s' % policy.compute_dtype)
     LOG.info('Variable dtype: %s' % policy.variable_dtype)
+
+
+def enable_XLA(conf):
+    os.environ['XLA_FLAGS'] = "--xla_gpu_cuda_data_dir='" + conf.path_to_cuda + "'"
+    tf.config.optimizer.set_jit("autoclustering")

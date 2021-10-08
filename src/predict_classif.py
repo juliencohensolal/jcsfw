@@ -56,7 +56,10 @@ if __name__ == '__main__' :
     # Setup everything
     LOG.info("Setup everything")
     startup.allow_gpu_ram_growth()
-    startup.set_mixed_precision()
+    if conf_train.mixed_precision:
+        startup.set_mixed_precision()
+    if conf_train.xla:
+        startup.enable_XLA(conf_train)
     startup.seed_everything(conf_train.seed)
     config.save_config(
         experiment_dir_train, "cfg_experiment.yml", experiment_dir, suffix="_pred")

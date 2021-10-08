@@ -49,7 +49,10 @@ if __name__ == '__main__' :
     # Setup everything
     LOG.info("Setup everything")
     startup.allow_gpu_ram_growth()
-    startup.set_mixed_precision()
+    if conf.mixed_precision:
+        startup.set_mixed_precision()
+    if conf.xla:
+        startup.enable_XLA(conf)
     startup.seed_everything(conf.seed)
     config.save_config("cfg/", args.cfg, experiment_dir)
     config.save_config("cfg/", args.cfg_proj, experiment_dir)
