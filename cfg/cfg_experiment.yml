@@ -5,7 +5,7 @@ log_level: 20
 seed: 42
 
 # Display
-model_summary: True
+model_summary: False
 tensorboard: True
 
 # Data
@@ -17,20 +17,24 @@ nb_saved_augmented_img: 16
 # CV
 first_fold_only: True
 n_folds: 5
-stratified: True
-val_size: 0.2
+#stratified: True
+#val_size: 0.2
 
 # Base network
 base: "DenseNet121"
 include_top: False
 init_weights: "imagenet"
-unfreeze_layers: -1
+unfreeze_layers: 0
 
 # Network head
-dropout: 0.2
+dropout: 0.1
 
 # Optimizer
-optimizer: "Nadam"
+optimizer: "RectifiedAdam"
+### for AdamW, LAMB, RectifiedAdam
+weight_decay: 0.0001
+
+# Learning rate
 lr: "RampUp"
 lr_start: 0.00001
 ### for CosineDecay, CosineDecayRestarts
@@ -49,6 +53,10 @@ lr_rampup_max: 0.0001
 lr_rampup_min: 0.00002
 lr_rampup_sustain_epochs: 0
 
+# Warmup
+warmup_epochs: 0
+warmup_lr: 0.0005
+
 # Training
 balanced_weights: False
 checkpoints: True
@@ -57,10 +65,6 @@ epochs: 15
 loss: "SparseCategoricalCrossentropy"
 metrics: "SparseCategoricalAccuracy"
 restore_best_after_training: True
-
-# Warmup
-warmup_epochs: 0
-warmup_lr: 0.0005
 
 # Augmentations - train
 train_central_crop: 0 # in [0:1]; 0=do nothing, 1=nothing left
