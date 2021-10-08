@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+import os
 import sys
 from time import time
 
@@ -21,6 +22,17 @@ def parse_args():
         "--train_dir", type=str, help="Folder where to find the train experiment")
     args = parser.parse_args()
     return args
+
+
+def fcount(path, map = {}):
+    count = 0
+    for f in os.listdir(path):
+        child = os.path.join(path, f)
+        if os.path.isdir(child):
+            child_count = fcount(child, map)
+            count += child_count + 1 # unless include self
+    map[path] = count
+    return count
 
 
 if __name__ == '__main__' :
@@ -81,30 +93,46 @@ if __name__ == '__main__' :
         LOG.info("Print model summary")
         model.summary(print_fn=LOG.info)
 
-    # Load pretrained weights
-    LOG.info("Load pretrained weights")
-    weights = ""
-    checkpoint_dir = experiment_dir_train + "checkpoints/fold_0/"
-    weights = tf.train.latest_checkpoint(checkpoint_dir)
-    LOG.info("Weights : " + weights)
-    model.load_weights(weights)
+    # Iterate over trained folds
+    LOG.info("Iterate over trained folds")
+    all_probas, all_preds = [], []
+    checkpoint_dir = experiment_dir_train + "checkpoints/"
+    n_trained_folds = fcount(checkpoint_dir)
+    for i in range(n_trained_folds):
+        LOG.info("========== FOLD #" + str(i) + " ==========")
+        print("========== FOLD #" + str(i) + " ==========")
+
+        # Load pretrained weights
+        LOG.info("Load pretrained weights")
+        weights_dir = checkpoint_dir + "fold_" + str(i) + "/"
+        weights = tf.train.latest_checkpoint(weights_dir)
+        LOG.info("Weights : " + weights)
+        model.load_weights(weights)
+
+        # Predict test images
+        LOG.info("Predict test images")
+        probas = model.predict(test_batches)
+        all_probas.append(probas)
 
     # Get image IDs from test set
-    LOG.info("Get image IDs from test set")
+    LOG.debug("Get image IDs from test set")
     test_ids_ds = test_batches.map(lambda img, idnum: idnum).unbatch()
     test_ids = next(iter(test_ids_ds.batch(n_test_images))).numpy().astype('U')
 
-    # Predict test images
-    LOG.info("Predict test images")
-    probas = model.predict(test_batches)
-    df_probas = pd.DataFrame(np.vstack(probas))
+    # Average predictions
+    LOG.debug("Average predictions")
+    avg_probas = np.average(all_probas, axis=0)
+
+    # Generate predictions from probas
+    LOG.info("Generate predictions from probas")
+    avg_predictions = np.argmax(avg_probas, axis=-1)
+
+    # Save probas
+    LOG.info("Save probas")
+    df_probas = pd.DataFrame(np.vstack(avg_probas))
     col_names = df_probas.columns.values.tolist()
     df_probas["id"] = test_ids
     df_probas = df_probas[["id"] + col_names]
     df_probas.to_csv(experiment_dir + "probas.csv", header=True, index=False)
-
-    # Generate predictions from probas
-    LOG.info("Generate predictions from probas")
-    predictions = np.argmax(probas, axis=-1)
-    df_probas = pd.DataFrame({'id': test_ids, 'label': predictions})
-    df_probas.to_csv(experiment_dir + "preds.csv", header=True, index=False)
+    df_preds = pd.DataFrame({'id': test_ids, 'label': avg_predictions})
+    df_preds.to_csv(experiment_dir + "preds.csv", header=True, index=False)
