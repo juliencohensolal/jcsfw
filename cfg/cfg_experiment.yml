@@ -9,7 +9,7 @@ xla: True
 
 # Display
 model_summary: False
-tensorboard: True
+tensorboard: False
 
 # Data
 batch_size: 32
@@ -27,7 +27,7 @@ n_folds: 5
 base: "DenseNet121"
 include_top: False
 init_weights: "imagenet"
-unfreeze_layers: 0
+unfreeze_layers: -1
 
 # Network head
 dropout: 0.1
@@ -57,7 +57,7 @@ lr_rampup_min: 0.00002
 lr_rampup_sustain_epochs: 0
 
 # Warmup
-warmup_epochs: 0
+warmup_epochs: 1
 warmup_lr: 0.0005
 
 # Training

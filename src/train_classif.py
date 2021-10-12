@@ -11,7 +11,7 @@ import tensorflow as tf
 
 from projects import cassava, flowers
 from utils import augmentations, c_logging, config, cv, data, loss_handler, lr_handler
-from utils import metric_handler, network_handler, optimizer_handler, startup, visualize
+from utils import metric_handler, mlflow_log, network_handler, optimizer_handler, startup, visualize
 
 
 LOG = c_logging.getLogger(__name__)
@@ -228,6 +228,13 @@ if __name__ == '__main__' :
                 save_weights_only=True)
             callbacks.append(cp_callback)
 
+        # Set up MLFlow tracking
+        LOG.debug("Set up MLFlow tracking")
+        mlflow_log.setup(
+            mlf_exp_name=conf_proj.project,
+            mlf_run_name=conf_proj.project + "_" + conf_proj.task + "_" + str(experiment_id))
+        mlflow_log.log_run(conf)
+
         # Train model
         LOG.info("Train model")
         if conf.balanced_weights:
@@ -247,8 +254,11 @@ if __name__ == '__main__' :
                 callbacks=callbacks)
 
         # Log fold results
+        LOG.info("Log fold results")
         for key, value in history.history.items():
             LOG.info(key + " " + str(np.round(value, 5)))
+
+        mlflow_log.end_run()
 
         if conf.first_fold_only:
             break

@@ -3,6 +3,7 @@ __pycache__/
 
 # Results of runs
 experiments/
+mlruns/
 
 # Personal working document
 TODO list.txt
