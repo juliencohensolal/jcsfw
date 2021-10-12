@@ -74,8 +74,8 @@ def add_cutmix(image, label, conf, conf_proj):
         # Warning : labels will be one hot encoded
         proportion = tf.cast((xb-xa) * (yb-ya) / conf.img_size / conf.img_size, tf.float32)
         if len(label.shape)==1:
-            lab1 = tf.one_hot(label[j], conf_proj.classes)
-            lab2 = tf.one_hot(label[cutwith_img_idx], conf_proj.classes)
+            lab1 = tf.one_hot(label[j], conf_proj.n_classes)
+            lab2 = tf.one_hot(label[cutwith_img_idx], conf_proj.n_classes)
         else:
             lab1 = label[j, ]
             lab2 = label[cutwith_img_idx, ]
@@ -83,7 +83,7 @@ def add_cutmix(image, label, conf, conf_proj):
 
     # Only useful for TPU? Not sure
     image2 = tf.reshape(tf.stack(imgs), (conf.batch_size, conf.img_size, conf.img_size, conf.channels))
-    label2 = tf.reshape(tf.stack(labs), (conf.batch_size, conf_proj.classes))
+    label2 = tf.reshape(tf.stack(labs), (conf.batch_size, conf_proj.n_classes))
     return image2, label2
 
 
@@ -110,8 +110,8 @@ def add_mixup(image, label, conf, conf_proj):
         # Update label of mixup image
         # Warning : labels will be one hot encoded
         if len(label.shape)==1:
-            lab1 = tf.one_hot(label[j], conf_proj.classes)
-            lab2 = tf.one_hot(label[mixwith_img_idx], conf_proj.classes)
+            lab1 = tf.one_hot(label[j], conf_proj.n_classes)
+            lab2 = tf.one_hot(label[mixwith_img_idx], conf_proj.n_classes)
         else:
             lab1 = label[j, ]
             lab2 = label[mixwith_img_idx, ]
@@ -119,5 +119,5 @@ def add_mixup(image, label, conf, conf_proj):
 
     # Only useful for TPU? Not sure
     image2 = tf.reshape(tf.stack(imgs), (conf.batch_size, conf.img_size, conf.img_size, conf.channels))
-    label2 = tf.reshape(tf.stack(labs), (conf.batch_size, conf_proj.classes))
+    label2 = tf.reshape(tf.stack(labs), (conf.batch_size, conf_proj.n_classes))
     return image2, label2

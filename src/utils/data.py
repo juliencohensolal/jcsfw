@@ -30,12 +30,7 @@ def show_data_shape(train_batches, title):
 
 def one_hot_encode_labels(image, label, conf, conf_proj):
     if len(label.shape)==1:
-        ohlabels = []
-        for j in range(conf.batch_size):
-                ohlabels.append(tf.one_hot(label[j], conf_proj.classes))
-
-        # Only useful for TPU? Not sure
-        label2 = tf.reshape(tf.stack(ohlabels), (conf.batch_size, conf_proj.classes))
+        label2 = tf.one_hot(label, conf_proj.n_classes)
     else:
         label2 = label
     return image, label2

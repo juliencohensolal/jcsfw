@@ -33,7 +33,7 @@ unfreeze_layers: -1
 dropout: 0.1
 
 # Optimizer
-optimizer: "RectifiedAdam"
+optimizer: "Adam"
 ### for AdamW, LAMB, RectifiedAdam
 weight_decay: 0.0001
 
@@ -64,9 +64,10 @@ warmup_lr: 0.0005
 balanced_weights: False
 checkpoints: True
 early_stopping_epochs: 4
-epochs: 15
-loss: "SparseCategoricalCrossentropy"
-metrics: "SparseCategoricalAccuracy"
+epochs: 20
+loss: "CategoricalCrossentropy"
+metrics: "CategoricalAccuracy"
+onehot: True
 restore_best_after_training: True
 
 # Augmentations - train

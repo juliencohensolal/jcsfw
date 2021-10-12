@@ -105,6 +105,16 @@ if __name__ == '__main__' :
         val_batches = data.get_img_batches(conf, val_dataset)
         data.show_data_shape(val_batches, "Validation")
 
+        if conf.onehot:
+            # One-hot encode targets
+            LOG.info("One-hot encode targets")
+            train_batches = train_batches.map(
+                lambda image, label: data.one_hot_encode_labels(image, label, conf, conf_proj), num_parallel_calls=AUTO)
+            val_batches = val_batches.map(
+                lambda image, label: data.one_hot_encode_labels(image, label, conf, conf_proj), num_parallel_calls=AUTO)
+            data.show_data_shape(train_batches, "Training")
+            data.show_data_shape(val_batches, "Validation")
+
         if conf.train_cutmix_proba > 0:
             # Apply cutmix
             LOG.info("Apply cutmix")
