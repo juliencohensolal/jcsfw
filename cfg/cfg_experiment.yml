@@ -65,6 +65,7 @@ balanced_weights: False
 checkpoints: True
 early_stopping_epochs: 4
 epochs: 20
+label_smoothing: 0. # [0,1] 0=no smoothing. >0=larger values squeeze labels towards 0.5
 loss: "CategoricalCrossentropy"
 metrics: "CategoricalAccuracy"
 onehot: True

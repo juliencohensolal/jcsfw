@@ -7,10 +7,12 @@ LOG = c_logging.getLogger(__name__)
 
 def get_loss(conf):
     loss = None
-    if conf.loss == "SparseCategoricalCrossentropy":
-        loss = losses.SparseCategoricalCrossentropy(from_logits=False)
+    if conf.loss == "BinaryCrossentropy":
+        loss = losses.BinaryCrossentropy(from_logits=False, label_smoothing=conf.label_smoothing)
     elif conf.loss == "CategoricalCrossentropy":
-        loss = losses.CategoricalCrossentropy(from_logits=False)
+        loss = losses.CategoricalCrossentropy(from_logits=False, label_smoothing=conf.label_smoothing)
+    elif conf.loss == "SparseCategoricalCrossentropy":
+        loss = losses.SparseCategoricalCrossentropy(from_logits=False)
     else:
         LOG.error("Unknown loss, quitting")
     return loss
