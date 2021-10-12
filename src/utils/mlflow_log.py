@@ -74,5 +74,17 @@ def log_run(conf):
     mlflow.log_params(params)
 
 
-def end_run():
+def end_run(history):
+    # Log metrics
+    metrics = {}
+    for i, (key, value) in enumerate(history):
+        if i == 0:
+            metrics["_best_loss"] = min(value)
+        elif i == 1:
+            metrics["_best_metric"] = max(value)
+        elif i == 2:
+            metrics["_best_val_loss"] = min(value)
+        elif i == 3:
+            metrics["_best_val_metric"] = max(value)
+    mlflow.log_metrics(metrics)
     mlflow.end_run()

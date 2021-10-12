@@ -268,7 +268,7 @@ if __name__ == '__main__' :
         for key, value in history.history.items():
             LOG.info(key + " " + str(np.round(value, 5)))
 
-        mlflow_log.end_run()
+        mlflow_log.end_run(history.history.items())
 
         if conf.first_fold_only:
             break
