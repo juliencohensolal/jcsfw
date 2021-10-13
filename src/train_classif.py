@@ -88,7 +88,7 @@ if __name__ == '__main__' :
         # Add augmentations
         LOG.debug("Add augmentations")
         train_dataset = train_dataset.map(
-            lambda image, label: augmentations.add_augmentations(image, label, conf), num_parallel_calls=AUTO)
+            lambda image, label: augmentations.add_augmentations(image, label, conf, conf_proj), num_parallel_calls=AUTO)
 
         if conf.balanced_weights:
             # Get balanced weights
