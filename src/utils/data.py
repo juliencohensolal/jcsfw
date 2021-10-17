@@ -28,7 +28,7 @@ def show_data_shape(train_batches, title):
         LOG.info(str(image.numpy().shape) + " - " +  str(label.numpy().shape))
 
 
-def one_hot_encode_labels(image, label, conf, conf_proj):
+def one_hot_encode_labels(image, label, conf_proj):
     if len(label.shape)==1:
         label2 = tf.one_hot(label, conf_proj.n_classes)
     else:
@@ -101,6 +101,7 @@ def read_unlabeled_tfrecord(example, img_size, channels, conf_proj):
 def decode_image(image_data, img_size, channels):
     image = tf.image.decode_jpeg(image_data, channels=channels)
     image = tf.cast(image, tf.float32) / 255.0  # convert image to floats in [0, 1] range
+    image = tf.image.resize(image, size=[*[img_size, img_size]], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
     image = tf.reshape(image, [*[img_size, img_size], channels])
     return image
 

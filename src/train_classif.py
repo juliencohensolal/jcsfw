@@ -109,9 +109,9 @@ if __name__ == '__main__' :
             # One-hot encode targets
             LOG.info("One-hot encode targets")
             train_batches = train_batches.map(
-                lambda image, label: data.one_hot_encode_labels(image, label, conf, conf_proj), num_parallel_calls=AUTO)
+                lambda image, label: data.one_hot_encode_labels(image, label, conf_proj), num_parallel_calls=AUTO)
             val_batches = val_batches.map(
-                lambda image, label: data.one_hot_encode_labels(image, label, conf, conf_proj), num_parallel_calls=AUTO)
+                lambda image, label: data.one_hot_encode_labels(image, label, conf_proj), num_parallel_calls=AUTO)
             data.show_data_shape(train_batches, "Training")
             data.show_data_shape(val_batches, "Validation")
 
@@ -122,7 +122,7 @@ if __name__ == '__main__' :
                 lambda image, label: augmentations.add_cutmix(image, label, conf, conf_proj), num_parallel_calls=AUTO)
             data.show_data_shape(train_batches, "Training")
             val_batches = val_batches.map(
-                lambda image, label: data.one_hot_encode_labels(image, label, conf, conf_proj), num_parallel_calls=AUTO)
+                lambda image, label: data.one_hot_encode_labels(image, label, conf_proj), num_parallel_calls=AUTO)
             data.show_data_shape(val_batches, "Validation")
         elif conf.train_mixup_proba > 0:
             # Apply mixup
@@ -131,7 +131,7 @@ if __name__ == '__main__' :
                 lambda image, label: augmentations.add_mixup(image, label, conf, conf_proj), num_parallel_calls=AUTO)
             data.show_data_shape(train_batches, "Training")
             val_batches = val_batches.map(
-                lambda image, label: data.one_hot_encode_labels(image, label, conf, conf_proj), num_parallel_calls=AUTO)
+                lambda image, label: data.one_hot_encode_labels(image, label, conf_proj), num_parallel_calls=AUTO)
             data.show_data_shape(val_batches, "Validation")
 
         # Save first augmented images
