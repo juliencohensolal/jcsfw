@@ -74,27 +74,36 @@ restore_best_after_training: True
 train_cutmix_proba: 0. # in [0.:1.]; 0.=do nothing, 1.=all images use cutmix
 train_mixup_proba: 0. # in [0.:1.]; 0.=do nothing, 1.=all images use mixup
 
-#train_central_crop: 0 # in [0:1]; 0=do nothing, 1=nothing left
-#train_random_brightness: 0. # 0=do nothing; 0=default brightness; bigger=brighter
-#train_random_contrast: [0., 0.] # [0, 0]=do nothing; 1=starting contrast; Center around 1 for balanced mix
-#train_random_crop: 0 # in pixels; 0=do nothing
-#train_random_flip_left_right: False
-#train_random_flip_up_down: False
-#train_random_hue: 0. # 0=do nothing; 0=default hue; 0.5=max allowed
-#train_random_saturation: [0., 0.] # [0, 0]=do nothing; 1=starting saturation; Center around 1 for balanced mix
-#train_rot90: False
+train_blur: [0., 0.] # [max € [3,inf], proba € [0:1]]
+train_centercrop: [0., 0.] # crop_proportion € [0, 100], proba € [0:1]
+train_clahe: [0, 0, 0] # [max € [1,inf], tile_grid_size € [1,inf], proba € [0:1]]
+train_coarse_dropout: [0, 0, 0, 0] # [min_nb_holes € [1,inf], max_nb_holes € [min_nb_holes,inf], hole_size € [1,imh_size], proba € [0:1]]
+train_crop: [0, 0, 0, 0, 0] # xmin/max ymin/max € [1,img_size], proba € [0:1]
+train_horizontal_flip: 0. # proba € [0:1]
+train_hue_sat_value: [0, 0, 0, 0] # [shift_limit, sat_shift, val_shift € [0,inf], proba € [0:1]]
+train_random_brightness: [0., 0.] # [factor, proba € [0:1]]
+train_random_contrast: [0., 0.] # [factor, proba € [0:1]]
+train_random_fog: [0, 0, 0, 0] # [intensity_low, intensity_high € [0,1], alpha_coef € [0,1], proba € [0:1]]
+train_random_grid_shuffle: [0, 0, 0] # [vertical_split, horiz_split € [1,5], proba € [0:1]]
+train_random_resized_crop: [0, 0, 0] # [scale_min, scale_max € [0,1], proba € [0:1]]
+train_rotate: [90, 0.9] # angle € [0:180], proba € [0:1]
+train_vertical_flip: 0. # proba € [0:1]
 
-train_alb_blur: [0., 0.] # [max € [3,inf], proba € [0:1]]
-train_alb_centercrop: [0., 0.] # crop_proportion € [0, 100], proba € [0:1]
-train_alb_clahe: [0, 0, 0] # [max € [1,inf], tile_grid_size € [1,inf], proba € [0:1]]
-train_alb_coarse_dropout: [0, 0, 0, 0] # [min_nb_holes € [1,inf], max_nb_holes € [min_nb_holes,inf], hole_size € [1,imh_size], proba € [0:1]]
-train_alb_crop: [0, 0, 0, 0, 0] # xmin/max ymin/max € [1,img_size], proba € [0:1]
-train_alb_horizontal_flip: 0. # proba € [0:1]
-train_alb_hue_sat_value: [0, 0, 0, 0] # [shift_limit, sat_shift, val_shift € [0,inf], proba € [0:1]]
-train_alb_random_brightness: [0., 0.] # [factor, proba € [0:1]]
-train_alb_random_contrast: [0., 0.] # [factor, proba € [0:1]]
-train_alb_random_fog: [0, 0, 0, 0] # [intensity_low, intensity_high € [0,1], alpha_coef € [0,1], proba € [0:1]]
-train_alb_random_grid_shuffle: [0, 0, 0] # [vertical_split, horiz_split € [1,5], proba € [0:1]]
-train_alb_random_resized_crop: [0, 0, 0] # [scale_min, scale_max € [0,1], proba € [0:1]]
-train_alb_rotate: [90, 0.9] # angle € [0:180], proba € [0:1]
-train_alb_vertical_flip: 0. # proba € [0:1]
+# Augmentations - test
+test_cutmix_proba: 0. # in [0.:1.]; 0.=do nothing, 1.=all images use cutmix
+test_mixup_proba: 0. # in [0.:1.]; 0.=do nothing, 1.=all images use mixup
+
+test_blur: [0., 0.] # [max € [3,inf], proba € [0:1]]
+test_centercrop: [0., 0.] # crop_proportion € [0, 100], proba € [0:1]
+test_clahe: [0, 0, 0] # [max € [1,inf], tile_grid_size € [1,inf], proba € [0:1]]
+test_coarse_dropout: [0, 0, 0, 0] # [min_nb_holes € [1,inf], max_nb_holes € [min_nb_holes,inf], hole_size € [1,imh_size], proba € [0:1]]
+test_crop: [0, 0, 0, 0, 0] # xmin/max ymin/max € [1,img_size], proba € [0:1]
+test_horizontal_flip: 0. # proba € [0:1]
+test_hue_sat_value: [0, 0, 0, 0] # [shift_limit, sat_shift, val_shift € [0,inf], proba € [0:1]]
+test_random_brightness: [0., 0.] # [factor, proba € [0:1]]
+test_random_contrast: [0., 0.] # [factor, proba € [0:1]]
+test_random_fog: [0, 0, 0, 0] # [intensity_low, intensity_high € [0,1], alpha_coef € [0,1], proba € [0:1]]
+test_random_grid_shuffle: [0, 0, 0] # [vertical_split, horiz_split € [1,5], proba € [0:1]]
+test_random_resized_crop: [0, 0, 0] # [scale_min, scale_max € [0,1], proba € [0:1]]
+test_rotate: [30, 0.5] # angle € [0:180], proba € [0:1]
+test_vertical_flip: 0. # proba € [0:1]

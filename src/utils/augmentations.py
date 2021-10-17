@@ -9,7 +9,7 @@ import utils.c_logging as c_logging
 LOG = c_logging.getLogger(__name__)
 
 
-def add_augmentations(image, label, conf, conf_proj):
+def add_augmentations(image, label, conf, conf_proj, is_train=True):
     def alb_aug(image):
         data = {conf_proj.tfrec_img: image}
         aug_data  = transforms(**data)
@@ -17,138 +17,226 @@ def add_augmentations(image, label, conf, conf_proj):
         aug_img = tf.cast(aug_img, tf.float32)
         return aug_img
 
-    '''seed = tf.random.uniform((2,), minval=0, maxval=100, dtype=tf.int32)
+    if is_train:
+        # Train
 
-    if conf.train_random_flip_left_right:
-        LOG.info("Applying train_random_flip_left_right")
-        image = tf.image.stateless_random_flip_left_right(image, seed=seed)
-    if conf.train_random_flip_up_down:
-        LOG.info("Applying train_random_flip_up_down")
-        image = tf.image.stateless_random_flip_up_down(image, seed=seed)
-    if conf.train_rot90:
-        LOG.info("Applying train_rot90")
-        proba = random.random()
-        if proba > .75:
-            image = tf.image.rot90(image, k=3) # Rotate 270º
-        elif .5 > proba > .25:
-            image = tf.image.rot90(image, k=1) # Rotate 90º
-    if conf.train_random_brightness != 0:
-        LOG.info("Applying train_random_brightness")
-        image = tf.image.stateless_random_brightness(image, max_delta=conf.train_random_brightness, seed=seed)
-    if conf.train_random_hue != 0:
-        LOG.info("Applying train_random_hue")
-        image = tf.image.stateless_random_hue(image, max_delta=conf.train_random_hue, seed=seed)
-    if conf.train_random_saturation != [0, 0]:
-        LOG.info("Applying train_random_saturation")
-        image = tf.image.stateless_random_saturation(
-            image, lower=conf.train_random_saturation[0], upper=conf.train_random_saturation[1], seed=seed)
-    if conf.train_random_contrast != [0, 0]:
-        LOG.info("Applying train_random_contrast")
-        image = tf.image.stateless_random_contrast(
-            image, lower=conf.train_random_contrast[0], upper=conf.train_random_contrast[1], seed=seed)
-    if conf.train_random_crop != 0:
-        LOG.info("Applying train_random_crop")
-        image = tf.image.stateless_random_crop(
-            image, size=[conf.train_random_crop, conf.train_random_crop, conf.channels], seed=seed)
-    if conf.train_central_crop != 0:
-        LOG.info("Applying train_central_crop")
-        image = tf.image.central_crop(
-            image, central_fraction=conf.train_central_crop)'''
+        if conf.train_blur != [0, 0]:
+            LOG.info("Applying train_blur")
+            transforms = alb.Compose([alb.Blur(
+                blur_limit=conf.train_blur[0], p=conf.train_blur[1])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
-    if conf.train_alb_blur != [0, 0]:
-        LOG.info("Applying train_alb_blur")
-        transforms = alb.Compose([alb.Blur(
-            blur_limit=conf.train_alb_blur[0], p=conf.train_alb_blur[1])])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-    if conf.train_alb_centercrop != [0, 0]:
-        LOG.info("Applying train_alb_centercrop")
-        transforms = alb.Compose([alb.CenterCrop(
-            height=int(conf.img_size - (conf.train_alb_centercrop[0] * conf.img_size / 100)), 
-            width=int(conf.img_size - (conf.train_alb_centercrop[0] * conf.img_size / 100)), 
-            p=conf.train_alb_centercrop[1]), 
-            alb.Resize(conf.img_size, conf.img_size)])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-    '''if conf.train_alb_clahe != [0, 0, 0]:
-        LOG.info("Applying train_alb_clahe")
-        transforms = alb.Compose([alb.CLAHE(
-            clip_limit=conf.train_alb_clahe[0], 
-            tile_grid_size=[conf.train_alb_clahe[1], conf.train_alb_clahe[1]], 
-            p=conf.train_alb_clahe[2])])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)'''
-    if conf.train_alb_coarse_dropout != [0, 0, 0, 0]:
-        LOG.info("Applying train_alb_coarse_dropout")
-        transforms = alb.Compose([alb.CoarseDropout(
-            min_holes=conf.train_alb_coarse_dropout[0], 
-            max_holes=conf.train_alb_coarse_dropout[1], 
-            max_height=conf.train_alb_coarse_dropout[2], 
-            max_width=conf.train_alb_coarse_dropout[2], 
-            p=conf.train_alb_coarse_dropout[3])])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-    if conf.train_alb_crop != [0, 0, 0, 0, 0]:
-        LOG.info("Applying train_alb_crop")
-        transforms = alb.Compose([alb.Crop(
-            x_min=conf.train_alb_crop[0], 
-            x_max=conf.train_alb_crop[1], 
-            y_min=conf.train_alb_crop[2], 
-            y_max=conf.train_alb_crop[3], 
-            p=conf.train_alb_crop[4]), 
-            alb.Resize(conf.img_size, conf.img_size)])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-    if conf.train_alb_horizontal_flip != 0:
-        LOG.info("Applying train_alb_horizontal_flip")
-        transforms = alb.Compose([alb.HorizontalFlip(p=conf.train_alb_horizontal_flip)])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-    if conf.train_alb_hue_sat_value != [0, 0, 0, 0]:
-        LOG.info("Applying train_alb_hue_sat_value")
-        transforms = alb.Compose([alb.HueSaturationValue(
-            hue_shift_limit=conf.train_alb_hue_sat_value[0], 
-            sat_shift_limit=conf.train_alb_hue_sat_value[1], 
-            val_shift_limit=conf.train_alb_hue_sat_value[2], 
-            p=conf.train_alb_hue_sat_value[3])])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-    if conf.train_alb_random_brightness != [0, 0]:
-        LOG.info("Applying train_alb_random_brightness")
-        transforms = alb.Compose([alb.RandomBrightness(
-            limit=conf.train_alb_random_brightness[0], p=conf.train_alb_random_brightness[1])])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-    if conf.train_alb_random_contrast != [0, 0]:
-        LOG.info("Applying train_alb_random_contrast")
-        transforms = alb.Compose([alb.RandomContrast(
-            limit=conf.train_alb_random_contrast[0], p=conf.train_alb_random_contrast[1])])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-    if conf.train_alb_random_fog != [0, 0, 0, 0]:
-        LOG.info("Applying train_alb_random_fog")
-        transforms = alb.Compose([alb.RandomFog(
-            fog_coef_lower=conf.train_alb_random_fog[0], 
-            fog_coef_upper=conf.train_alb_random_fog[1], 
-            alpha_coef=conf.train_alb_random_fog[2], 
-            p=conf.train_alb_random_fog[3])])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-    if conf.train_alb_random_grid_shuffle != [0, 0, 0]:
-        LOG.info("Applying train_alb_random_grid_shuffle")
-        transforms = alb.Compose([alb.RandomGridShuffle(
-            grid=(conf.train_alb_random_grid_shuffle[0], conf.train_alb_random_grid_shuffle[1]), 
-            p=conf.train_alb_random_grid_shuffle[2])])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-    if conf.train_alb_random_resized_crop != [0, 0, 0]:
-        LOG.info("Applying train_alb_random_resized_crop")
-        transforms = alb.Compose([alb.RandomResizedCrop(
-            height=conf.img_size,
-            width=conf.img_size,
-            ratio=(1., 1.),
-            scale=(conf.train_alb_random_resized_crop[0], conf.train_alb_random_resized_crop[1]), 
-            p=conf.train_alb_random_resized_crop[2])])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-    if conf.train_alb_rotate != [0, 0, 0]:
-        LOG.info("Applying train_alb_rotate")
-        transforms = alb.Compose([alb.Rotate(
-            limit=conf.train_alb_rotate[0], 
-            p=conf.train_alb_rotate[1])])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-    if conf.train_alb_vertical_flip != 0:
-        LOG.info("Applying train_alb_vertical_flip")
-        transforms = alb.Compose([alb.VerticalFlip(p=conf.train_alb_vertical_flip)])
-        image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+        if conf.train_centercrop != [0, 0]:
+            LOG.info("Applying train_centercrop")
+            transforms = alb.Compose([alb.CenterCrop(
+                height=int(conf.img_size - (conf.train_centercrop[0] * conf.img_size / 100)), 
+                width=int(conf.img_size - (conf.train_centercrop[0] * conf.img_size / 100)), 
+                p=conf.train_centercrop[1]), 
+                alb.Resize(conf.img_size, conf.img_size)])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        '''if conf.train_clahe != [0, 0, 0]:
+            LOG.info("Applying train_clahe")
+            transforms = alb.Compose([alb.CLAHE(
+                clip_limit=conf.train_clahe[0], 
+                tile_grid_size=[conf.train_clahe[1], conf.train_clahe[1]], 
+                p=conf.train_clahe[2])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)'''
+
+        if conf.train_coarse_dropout != [0, 0, 0, 0]:
+            LOG.info("Applying train_coarse_dropout")
+            transforms = alb.Compose([alb.CoarseDropout(
+                min_holes=conf.train_coarse_dropout[0], 
+                max_holes=conf.train_coarse_dropout[1], 
+                max_height=conf.train_coarse_dropout[2], 
+                max_width=conf.train_coarse_dropout[2], 
+                p=conf.train_coarse_dropout[3])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.train_crop != [0, 0, 0, 0, 0]:
+            LOG.info("Applying train_crop")
+            transforms = alb.Compose([alb.Crop(
+                x_min=conf.train_crop[0], 
+                x_max=conf.train_crop[1], 
+                y_min=conf.train_crop[2], 
+                y_max=conf.train_crop[3], 
+                p=conf.train_crop[4]), 
+                alb.Resize(conf.img_size, conf.img_size)])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.train_horizontal_flip != 0:
+            LOG.info("Applying train_horizontal_flip")
+            transforms = alb.Compose([alb.HorizontalFlip(p=conf.train_horizontal_flip)])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.train_hue_sat_value != [0, 0, 0, 0]:
+            LOG.info("Applying train_hue_sat_value")
+            transforms = alb.Compose([alb.HueSaturationValue(
+                hue_shift_limit=conf.train_hue_sat_value[0], 
+                sat_shift_limit=conf.train_hue_sat_value[1], 
+                val_shift_limit=conf.train_hue_sat_value[2], 
+                p=conf.train_hue_sat_value[3])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.train_random_brightness != [0, 0]:
+            LOG.info("Applying train_random_brightness")
+            transforms = alb.Compose([alb.RandomBrightness(
+                limit=conf.train_random_brightness[0], p=conf.train_random_brightness[1])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.train_random_contrast != [0, 0]:
+            LOG.info("Applying train_random_contrast")
+            transforms = alb.Compose([alb.RandomContrast(
+                limit=conf.train_random_contrast[0], p=conf.train_random_contrast[1])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.train_random_fog != [0, 0, 0, 0]:
+            LOG.info("Applying train_random_fog")
+            transforms = alb.Compose([alb.RandomFog(
+                fog_coef_lower=conf.train_random_fog[0], 
+                fog_coef_upper=conf.train_random_fog[1], 
+                alpha_coef=conf.train_random_fog[2], 
+                p=conf.train_random_fog[3])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.train_random_grid_shuffle != [0, 0, 0]:
+            LOG.info("Applying train_random_grid_shuffle")
+            transforms = alb.Compose([alb.RandomGridShuffle(
+                grid=(conf.train_random_grid_shuffle[0], conf.train_random_grid_shuffle[1]), 
+                p=conf.train_random_grid_shuffle[2])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.train_random_resized_crop != [0, 0, 0]:
+            LOG.info("Applying train_random_resized_crop")
+            transforms = alb.Compose([alb.RandomResizedCrop(
+                height=conf.img_size,
+                width=conf.img_size,
+                ratio=(1., 1.),
+                scale=(conf.train_random_resized_crop[0], conf.train_random_resized_crop[1]), 
+                p=conf.train_random_resized_crop[2])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.train_rotate != [0, 0, 0]:
+            LOG.info("Applying train_rotate")
+            transforms = alb.Compose([alb.Rotate(
+                limit=conf.train_rotate[0], 
+                p=conf.train_rotate[1])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+            
+        if conf.train_vertical_flip != 0:
+            LOG.info("Applying train_vertical_flip")
+            transforms = alb.Compose([alb.VerticalFlip(p=conf.train_vertical_flip)])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+    else:
+        # Predict
+        
+        if conf.test_blur != [0, 0]:
+            LOG.info("Applying test_blur")
+            transforms = alb.Compose([alb.Blur(
+                blur_limit=conf.test_blur[0], p=conf.test_blur[1])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.test_centercrop != [0, 0]:
+            LOG.info("Applying test_centercrop")
+            transforms = alb.Compose([alb.CenterCrop(
+                height=int(conf.img_size - (conf.test_centercrop[0] * conf.img_size / 100)), 
+                width=int(conf.img_size - (conf.test_centercrop[0] * conf.img_size / 100)), 
+                p=conf.test_centercrop[1]), 
+                alb.Resize(conf.img_size, conf.img_size)])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        '''if conf.test_clahe != [0, 0, 0]:
+            LOG.info("Applying test_clahe")
+            transforms = alb.Compose([alb.CLAHE(
+                clip_limit=conf.test_clahe[0], 
+                tile_grid_size=[conf.test_clahe[1], conf.test_clahe[1]], 
+                p=conf.test_clahe[2])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)'''
+
+        if conf.test_coarse_dropout != [0, 0, 0, 0]:
+            LOG.info("Applying test_coarse_dropout")
+            transforms = alb.Compose([alb.CoarseDropout(
+                min_holes=conf.test_coarse_dropout[0], 
+                max_holes=conf.test_coarse_dropout[1], 
+                max_height=conf.test_coarse_dropout[2], 
+                max_width=conf.test_coarse_dropout[2], 
+                p=conf.test_coarse_dropout[3])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.test_crop != [0, 0, 0, 0, 0]:
+            LOG.info("Applying test_crop")
+            transforms = alb.Compose([alb.Crop(
+                x_min=conf.test_crop[0], 
+                x_max=conf.test_crop[1], 
+                y_min=conf.test_crop[2], 
+                y_max=conf.test_crop[3], 
+                p=conf.test_crop[4]), 
+                alb.Resize(conf.img_size, conf.img_size)])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.test_horizontal_flip != 0:
+            LOG.info("Applying test_horizontal_flip")
+            transforms = alb.Compose([alb.HorizontalFlip(p=conf.test_horizontal_flip)])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.test_hue_sat_value != [0, 0, 0, 0]:
+            LOG.info("Applying test_hue_sat_value")
+            transforms = alb.Compose([alb.HueSaturationValue(
+                hue_shift_limit=conf.test_hue_sat_value[0], 
+                sat_shift_limit=conf.test_hue_sat_value[1], 
+                val_shift_limit=conf.test_hue_sat_value[2], 
+                p=conf.test_hue_sat_value[3])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.test_random_brightness != [0, 0]:
+            LOG.info("Applying test_random_brightness")
+            transforms = alb.Compose([alb.RandomBrightness(
+                limit=conf.test_random_brightness[0], p=conf.test_random_brightness[1])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.test_random_contrast != [0, 0]:
+            LOG.info("Applying test_random_contrast")
+            transforms = alb.Compose([alb.RandomContrast(
+                limit=conf.test_random_contrast[0], p=conf.test_random_contrast[1])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.test_random_fog != [0, 0, 0, 0]:
+            LOG.info("Applying test_random_fog")
+            transforms = alb.Compose([alb.RandomFog(
+                fog_coef_lower=conf.test_random_fog[0], 
+                fog_coef_upper=conf.test_random_fog[1], 
+                alpha_coef=conf.test_random_fog[2], 
+                p=conf.test_random_fog[3])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.test_random_grid_shuffle != [0, 0, 0]:
+            LOG.info("Applying test_random_grid_shuffle")
+            transforms = alb.Compose([alb.RandomGridShuffle(
+                grid=(conf.test_random_grid_shuffle[0], conf.test_random_grid_shuffle[1]), 
+                p=conf.test_random_grid_shuffle[2])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.test_random_resized_crop != [0, 0, 0]:
+            LOG.info("Applying test_random_resized_crop")
+            transforms = alb.Compose([alb.RandomResizedCrop(
+                height=conf.img_size,
+                width=conf.img_size,
+                ratio=(1., 1.),
+                scale=(conf.test_random_resized_crop[0], conf.test_random_resized_crop[1]), 
+                p=conf.test_random_resized_crop[2])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+
+        if conf.test_rotate != [0, 0, 0]:
+            LOG.info("Applying test_rotate")
+            transforms = alb.Compose([alb.Rotate(
+                limit=conf.test_rotate[0], 
+                p=conf.test_rotate[1])])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
+            
+        if conf.test_vertical_flip != 0:
+            LOG.info("Applying test_vertical_flip")
+            transforms = alb.Compose([alb.VerticalFlip(p=conf.test_vertical_flip)])
+            image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
     return image, label
 

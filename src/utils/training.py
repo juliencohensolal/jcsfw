@@ -3,7 +3,7 @@ import sys
 
 import tensorflow as tf
 
-import lr_handler
+import utils.lr_handler as lr_handler
 import utils.c_logging as c_logging
 
 LOG = c_logging.getLogger(__name__)

@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-import os
+import gc
 import sys
 from time import time
 
@@ -10,7 +10,7 @@ from sklearn.utils import shuffle
 import tensorflow as tf
 
 from projects import cassava, flowers
-from utils import augmentations, c_logging, config, cv, data, loss_handler, lr_handler, metric_handler
+from utils import augmentations, c_logging, config, data, loss_handler, metric_handler
 from utils import mlflow_log, network_handler, optimizer_handler, startup, training, visualize
 
 
@@ -88,12 +88,8 @@ if __name__ == '__main__' :
         # Add augmentations
         LOG.debug("Add augmentations")
         train_dataset = train_dataset.map(
-            lambda image, label: augmentations.add_augmentations(image, label, conf, conf_proj), num_parallel_calls=AUTO)
-
-        if conf.balanced_weights:
-            # Get balanced weights
-            LOG.debug("Get balanced weights")
-            balanced_weights = data.get_balanced_weights(train_dataset)
+            lambda image, label: augmentations.add_augmentations(
+                image, label, conf, conf_proj, is_train=True), num_parallel_calls=AUTO)
 
         # The training dataset must repeat for several epochs
         train_dataset = train_dataset.repeat()
@@ -174,6 +170,10 @@ if __name__ == '__main__' :
             # Train warm-up model
             LOG.info("Train warm-up model")
             if conf.balanced_weights:
+                # Get balanced weights
+                LOG.debug("Get balanced weights")
+                balanced_weights = data.get_balanced_weights(train_dataset)
+
                 history = model.fit(
                     x=train_batches, 
                     validation_data=val_batches, 
@@ -233,7 +233,10 @@ if __name__ == '__main__' :
         for key, value in history.history.items():
             LOG.info(key + " " + str(np.round(value, 5)))
 
+        # End fold cleanly
         mlflow_log.end_run(history.history.items())
+        del model
+        gc.collect()
 
         if conf.first_fold_only:
             break
