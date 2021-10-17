@@ -29,38 +29,38 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
         if conf.train_centercrop != [0, 0]:
             LOG.info("Applying train_centercrop")
             transforms = alb.Compose([alb.CenterCrop(
-                height=int(conf.img_size - (conf.train_centercrop[0] * conf.img_size / 100)), 
-                width=int(conf.img_size - (conf.train_centercrop[0] * conf.img_size / 100)), 
-                p=conf.train_centercrop[1]), 
+                height=int(conf.img_size - (conf.train_centercrop[0] * conf.img_size / 100)),
+                width=int(conf.img_size - (conf.train_centercrop[0] * conf.img_size / 100)),
+                p=conf.train_centercrop[1]),
                 alb.Resize(conf.img_size, conf.img_size)])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
         '''if conf.train_clahe != [0, 0, 0]:
             LOG.info("Applying train_clahe")
             transforms = alb.Compose([alb.CLAHE(
-                clip_limit=conf.train_clahe[0], 
-                tile_grid_size=[conf.train_clahe[1], conf.train_clahe[1]], 
+                clip_limit=conf.train_clahe[0],
+                tile_grid_size=[conf.train_clahe[1], conf.train_clahe[1]],
                 p=conf.train_clahe[2])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)'''
 
         if conf.train_coarse_dropout != [0, 0, 0, 0]:
             LOG.info("Applying train_coarse_dropout")
             transforms = alb.Compose([alb.CoarseDropout(
-                min_holes=conf.train_coarse_dropout[0], 
-                max_holes=conf.train_coarse_dropout[1], 
-                max_height=conf.train_coarse_dropout[2], 
-                max_width=conf.train_coarse_dropout[2], 
+                min_holes=conf.train_coarse_dropout[0],
+                max_holes=conf.train_coarse_dropout[1],
+                max_height=conf.train_coarse_dropout[2],
+                max_width=conf.train_coarse_dropout[2],
                 p=conf.train_coarse_dropout[3])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
         if conf.train_crop != [0, 0, 0, 0, 0]:
             LOG.info("Applying train_crop")
             transforms = alb.Compose([alb.Crop(
-                x_min=conf.train_crop[0], 
-                x_max=conf.train_crop[1], 
-                y_min=conf.train_crop[2], 
-                y_max=conf.train_crop[3], 
-                p=conf.train_crop[4]), 
+                x_min=conf.train_crop[0],
+                x_max=conf.train_crop[1],
+                y_min=conf.train_crop[2],
+                y_max=conf.train_crop[3],
+                p=conf.train_crop[4]),
                 alb.Resize(conf.img_size, conf.img_size)])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
@@ -72,9 +72,9 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
         if conf.train_hue_sat_value != [0, 0, 0, 0]:
             LOG.info("Applying train_hue_sat_value")
             transforms = alb.Compose([alb.HueSaturationValue(
-                hue_shift_limit=conf.train_hue_sat_value[0], 
-                sat_shift_limit=conf.train_hue_sat_value[1], 
-                val_shift_limit=conf.train_hue_sat_value[2], 
+                hue_shift_limit=conf.train_hue_sat_value[0],
+                sat_shift_limit=conf.train_hue_sat_value[1],
+                val_shift_limit=conf.train_hue_sat_value[2],
                 p=conf.train_hue_sat_value[3])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
@@ -93,16 +93,16 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
         if conf.train_random_fog != [0, 0, 0, 0]:
             LOG.info("Applying train_random_fog")
             transforms = alb.Compose([alb.RandomFog(
-                fog_coef_lower=conf.train_random_fog[0], 
-                fog_coef_upper=conf.train_random_fog[1], 
-                alpha_coef=conf.train_random_fog[2], 
+                fog_coef_lower=conf.train_random_fog[0],
+                fog_coef_upper=conf.train_random_fog[1],
+                alpha_coef=conf.train_random_fog[2],
                 p=conf.train_random_fog[3])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
         if conf.train_random_grid_shuffle != [0, 0, 0]:
             LOG.info("Applying train_random_grid_shuffle")
             transforms = alb.Compose([alb.RandomGridShuffle(
-                grid=(conf.train_random_grid_shuffle[0], conf.train_random_grid_shuffle[1]), 
+                grid=(conf.train_random_grid_shuffle[0], conf.train_random_grid_shuffle[1]),
                 p=conf.train_random_grid_shuffle[2])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
@@ -112,24 +112,24 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
                 height=conf.img_size,
                 width=conf.img_size,
                 ratio=(1., 1.),
-                scale=(conf.train_random_resized_crop[0], conf.train_random_resized_crop[1]), 
+                scale=(conf.train_random_resized_crop[0], conf.train_random_resized_crop[1]),
                 p=conf.train_random_resized_crop[2])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
         if conf.train_rotate != [0, 0, 0]:
             LOG.info("Applying train_rotate")
             transforms = alb.Compose([alb.Rotate(
-                limit=conf.train_rotate[0], 
+                limit=conf.train_rotate[0],
                 p=conf.train_rotate[1])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-            
+
         if conf.train_vertical_flip != 0:
             LOG.info("Applying train_vertical_flip")
             transforms = alb.Compose([alb.VerticalFlip(p=conf.train_vertical_flip)])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
     else:
         # Predict
-        
+
         if conf.test_blur != [0, 0]:
             LOG.info("Applying test_blur")
             transforms = alb.Compose([alb.Blur(
@@ -139,38 +139,38 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
         if conf.test_centercrop != [0, 0]:
             LOG.info("Applying test_centercrop")
             transforms = alb.Compose([alb.CenterCrop(
-                height=int(conf.img_size - (conf.test_centercrop[0] * conf.img_size / 100)), 
-                width=int(conf.img_size - (conf.test_centercrop[0] * conf.img_size / 100)), 
-                p=conf.test_centercrop[1]), 
+                height=int(conf.img_size - (conf.test_centercrop[0] * conf.img_size / 100)),
+                width=int(conf.img_size - (conf.test_centercrop[0] * conf.img_size / 100)),
+                p=conf.test_centercrop[1]),
                 alb.Resize(conf.img_size, conf.img_size)])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
         '''if conf.test_clahe != [0, 0, 0]:
             LOG.info("Applying test_clahe")
             transforms = alb.Compose([alb.CLAHE(
-                clip_limit=conf.test_clahe[0], 
-                tile_grid_size=[conf.test_clahe[1], conf.test_clahe[1]], 
+                clip_limit=conf.test_clahe[0],
+                tile_grid_size=[conf.test_clahe[1], conf.test_clahe[1]],
                 p=conf.test_clahe[2])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)'''
 
         if conf.test_coarse_dropout != [0, 0, 0, 0]:
             LOG.info("Applying test_coarse_dropout")
             transforms = alb.Compose([alb.CoarseDropout(
-                min_holes=conf.test_coarse_dropout[0], 
-                max_holes=conf.test_coarse_dropout[1], 
-                max_height=conf.test_coarse_dropout[2], 
-                max_width=conf.test_coarse_dropout[2], 
+                min_holes=conf.test_coarse_dropout[0],
+                max_holes=conf.test_coarse_dropout[1],
+                max_height=conf.test_coarse_dropout[2],
+                max_width=conf.test_coarse_dropout[2],
                 p=conf.test_coarse_dropout[3])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
         if conf.test_crop != [0, 0, 0, 0, 0]:
             LOG.info("Applying test_crop")
             transforms = alb.Compose([alb.Crop(
-                x_min=conf.test_crop[0], 
-                x_max=conf.test_crop[1], 
-                y_min=conf.test_crop[2], 
-                y_max=conf.test_crop[3], 
-                p=conf.test_crop[4]), 
+                x_min=conf.test_crop[0],
+                x_max=conf.test_crop[1],
+                y_min=conf.test_crop[2],
+                y_max=conf.test_crop[3],
+                p=conf.test_crop[4]),
                 alb.Resize(conf.img_size, conf.img_size)])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
@@ -182,9 +182,9 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
         if conf.test_hue_sat_value != [0, 0, 0, 0]:
             LOG.info("Applying test_hue_sat_value")
             transforms = alb.Compose([alb.HueSaturationValue(
-                hue_shift_limit=conf.test_hue_sat_value[0], 
-                sat_shift_limit=conf.test_hue_sat_value[1], 
-                val_shift_limit=conf.test_hue_sat_value[2], 
+                hue_shift_limit=conf.test_hue_sat_value[0],
+                sat_shift_limit=conf.test_hue_sat_value[1],
+                val_shift_limit=conf.test_hue_sat_value[2],
                 p=conf.test_hue_sat_value[3])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
@@ -203,16 +203,16 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
         if conf.test_random_fog != [0, 0, 0, 0]:
             LOG.info("Applying test_random_fog")
             transforms = alb.Compose([alb.RandomFog(
-                fog_coef_lower=conf.test_random_fog[0], 
-                fog_coef_upper=conf.test_random_fog[1], 
-                alpha_coef=conf.test_random_fog[2], 
+                fog_coef_lower=conf.test_random_fog[0],
+                fog_coef_upper=conf.test_random_fog[1],
+                alpha_coef=conf.test_random_fog[2],
                 p=conf.test_random_fog[3])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
         if conf.test_random_grid_shuffle != [0, 0, 0]:
             LOG.info("Applying test_random_grid_shuffle")
             transforms = alb.Compose([alb.RandomGridShuffle(
-                grid=(conf.test_random_grid_shuffle[0], conf.test_random_grid_shuffle[1]), 
+                grid=(conf.test_random_grid_shuffle[0], conf.test_random_grid_shuffle[1]),
                 p=conf.test_random_grid_shuffle[2])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
@@ -222,17 +222,17 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
                 height=conf.img_size,
                 width=conf.img_size,
                 ratio=(1., 1.),
-                scale=(conf.test_random_resized_crop[0], conf.test_random_resized_crop[1]), 
+                scale=(conf.test_random_resized_crop[0], conf.test_random_resized_crop[1]),
                 p=conf.test_random_resized_crop[2])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
         if conf.test_rotate != [0, 0, 0]:
             LOG.info("Applying test_rotate")
             transforms = alb.Compose([alb.Rotate(
-                limit=conf.test_rotate[0], 
+                limit=conf.test_rotate[0],
                 p=conf.test_rotate[1])])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
-            
+
         if conf.test_vertical_flip != 0:
             LOG.info("Applying test_vertical_flip")
             transforms = alb.Compose([alb.VerticalFlip(p=conf.test_vertical_flip)])

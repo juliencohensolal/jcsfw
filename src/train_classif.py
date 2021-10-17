@@ -40,9 +40,9 @@ if __name__ == '__main__' :
     experiment_dir = "./experiments/train/" + conf_proj.project + "_" + conf_proj.task + \
             "_" + str(experiment_id) + "/"
     c_logging.config(
-        project=conf_proj.project, 
-        task=conf_proj.task, 
-        experiment_id=experiment_id, 
+        project=conf_proj.project,
+        task=conf_proj.task,
+        experiment_id=experiment_id,
         experiment_dir=experiment_dir,
         log_level=conf.log_level)
 
@@ -175,16 +175,16 @@ if __name__ == '__main__' :
                 balanced_weights = data.get_balanced_weights(train_dataset)
 
                 history = model.fit(
-                    x=train_batches, 
-                    validation_data=val_batches, 
-                    epochs=conf.warmup_epochs, 
-                    steps_per_epoch=n_train_images//conf.batch_size, 
+                    x=train_batches,
+                    validation_data=val_batches,
+                    epochs=conf.warmup_epochs,
+                    steps_per_epoch=n_train_images//conf.batch_size,
                     class_weight=balanced_weights)
             else:
                 history = model.fit(
-                    x=train_batches, 
-                    validation_data=val_batches, 
-                    epochs=conf.warmup_epochs, 
+                    x=train_batches,
+                    validation_data=val_batches,
+                    epochs=conf.warmup_epochs,
                     steps_per_epoch=n_train_images//conf.batch_size)
 
         # Unfreeze layers if needed
@@ -214,18 +214,18 @@ if __name__ == '__main__' :
         LOG.info("Train model")
         if conf.balanced_weights:
             history = model.fit(
-                x=train_batches, 
-                validation_data=val_batches, 
-                epochs=conf.epochs, 
-                steps_per_epoch=n_train_images//conf.batch_size, 
-                callbacks=callbacks, 
+                x=train_batches,
+                validation_data=val_batches,
+                epochs=conf.epochs,
+                steps_per_epoch=n_train_images//conf.batch_size,
+                callbacks=callbacks,
                 class_weight=balanced_weights)
         else:
             history = model.fit(
-                x=train_batches, 
-                validation_data=val_batches, 
-                epochs=conf.epochs, 
-                steps_per_epoch=n_train_images//conf.batch_size, 
+                x=train_batches,
+                validation_data=val_batches,
+                epochs=conf.epochs,
+                steps_per_epoch=n_train_images//conf.batch_size,
                 callbacks=callbacks)
 
         # Log fold results

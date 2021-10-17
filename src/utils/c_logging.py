@@ -54,9 +54,9 @@ def add_file_handler(container_id, container_ip_address, formatter, log, log_lev
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     file_handler = TimedRotatingFileHandler(os.path.join(
-        log_dir, 
-        "{}_local0_{}.log".format(container_ip_address, log_level)), 
-        'midnight', 
+        log_dir,
+        "{}_local0_{}.log".format(container_ip_address, log_level)),
+        'midnight',
         1)
     file_handler.suffix = "%Y-%m-%d" # or anything else that strftime will allow
     file_handler.setFormatter(formatter)
