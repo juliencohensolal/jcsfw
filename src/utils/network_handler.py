@@ -1,7 +1,9 @@
+from classification_models.tfkeras import Classifiers # qubvel
 from tensorflow.keras import Input
 from tensorflow.keras.applications import densenet, DenseNet121, DenseNet169, DenseNet201
 from tensorflow.keras.applications import efficientnet, EfficientNetB0, EfficientNetB1, EfficientNetB2
 from tensorflow.keras.applications import EfficientNetB3, EfficientNetB4, EfficientNetB5
+from tensorflow.keras.applications import inception_resnet_v2, InceptionResNetV2
 from tensorflow.keras.applications import inception_v3, InceptionV3
 from tensorflow.keras.applications import mobilenet_v2, MobileNetV2
 from tensorflow.keras.applications import resnet_v2, ResNet50V2, ResNet101V2, ResNet152V2
@@ -84,6 +86,12 @@ def define_base(conf, inputs):
             input_shape=(*[conf.img_size, conf.img_size], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
+    elif conf.base == "InceptionResNetV2":
+        x = inception_resnet_v2.preprocess_input(inputs)
+        base_model = InceptionResNetV2(
+            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            include_top=conf.include_top,
+            weights=conf.init_weights)
     elif conf.base == "InceptionV3":
         x = inception_v3.preprocess_input(inputs)
         base_model = InceptionV3(
@@ -111,6 +119,34 @@ def define_base(conf, inputs):
     elif conf.base == "ResNet152V2":
         x = resnet_v2.preprocess_input(inputs)
         base_model = ResNet152V2(
+            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            include_top=conf.include_top,
+            weights=conf.init_weights)
+    elif conf.base == "ResNeXT50":
+        ResNeXT50, preprocess_input = Classifiers.get('resnext50')
+        x = preprocess_input(inputs)
+        base_model = ResNeXT50(
+            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            include_top=conf.include_top,
+            weights=conf.init_weights)
+    elif conf.base == "ResNeXT101":
+        ResNeXT101, preprocess_input = Classifiers.get('resnext101')
+        x = preprocess_input(inputs)
+        base_model = ResNeXT101(
+            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            include_top=conf.include_top,
+            weights=conf.init_weights)
+    elif conf.base == "SeResNeXT50":
+        SeResNeXT50, preprocess_input = Classifiers.get('seresnext50')
+        x = preprocess_input(inputs)
+        base_model = SeResNeXT50(
+            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            include_top=conf.include_top,
+            weights=conf.init_weights)
+    elif conf.base == "SeResNeXT101":
+        SeResNeXT101, preprocess_input = Classifiers.get('seresnext101')
+        x = preprocess_input(inputs)
+        base_model = SeResNeXT101(
             input_shape=(*[conf.img_size, conf.img_size], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
