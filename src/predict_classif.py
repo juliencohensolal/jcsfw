@@ -101,10 +101,8 @@ if __name__ == '__main__' :
     # Init logging
     experiment_id = int(time())
     experiment_dir = './experiments/predict/' + args.train_dir + "_pred_" + str(experiment_id) + "/"
-    task = args.train_dir.split("_")[1]
     c_logging.config(
         project=args.project, 
-        task=task, 
         experiment_id=experiment_id, 
         experiment_dir=experiment_dir,
         log_level=conf_train.log_level)

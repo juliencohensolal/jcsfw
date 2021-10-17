@@ -24,16 +24,16 @@ def getLogger(name):
     return logger
 
 
-def config(project, task, experiment_id, experiment_dir, log_level=logging.INFO):
+def config(project, experiment_id, experiment_dir, log_level=logging.INFO):
     log = logging.getLogger()
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     if not os.path.exists(experiment_dir):
         os.makedirs(experiment_dir)
-    file_handler = RotatingFileHandler(os.path.join(experiment_dir, '{}-{}-{}.log'.format(project, task, experiment_id)))
+    file_handler = RotatingFileHandler(os.path.join(experiment_dir, '{}-{}.log'.format(project, experiment_id)))
     file_handler.setFormatter(formatter)
     log.addHandler(file_handler)
     log.setLevel(log_level)
-    log.info('Logging %s %s %s', project, task, experiment_id)
+    log.info('Logging %s %s', project, experiment_id)
 
 
 def config_docker_local(perimeter, prog_name, log_level=logging.INFO):

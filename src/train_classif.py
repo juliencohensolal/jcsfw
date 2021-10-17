@@ -37,11 +37,9 @@ if __name__ == '__main__' :
 
     # Init logging
     experiment_id = int(time())
-    experiment_dir = "./experiments/train/" + conf_proj.project + "_" + conf_proj.task + \
-            "_" + str(experiment_id) + "/"
+    experiment_dir = "./experiments/train/" + conf_proj.project + "_" + str(experiment_id) + "/"
     c_logging.config(
         project=conf_proj.project,
-        task=conf_proj.task,
         experiment_id=experiment_id,
         experiment_dir=experiment_dir,
         log_level=conf.log_level)
@@ -207,7 +205,7 @@ if __name__ == '__main__' :
         LOG.debug("Set up MLFlow tracking")
         mlflow_log.setup(
             mlf_exp_name=conf_proj.project,
-            mlf_run_name=conf_proj.project + "_" + conf_proj.task + "_" + str(experiment_id))
+            mlf_run_name=conf_proj.project + "_" + str(experiment_id))
         mlflow_log.log_run(conf)
 
         # Train model
