@@ -62,10 +62,10 @@ def load_tfrecords_from_filenames(conf, conf_proj, filenames, phase, labeled=Tru
     dataset = dataset.with_options(ignore_order)
     if labeled:
         dataset = dataset.map(lambda x: read_labeled_tfrecord(
-            x, conf.img_size, conf.channels, conf_proj), num_parallel_calls=AUTO)
+            x, conf.img_size_y, conf.img_size_x, conf.channels, conf_proj), num_parallel_calls=AUTO)
     else:
         dataset = dataset.map(lambda x: read_unlabeled_tfrecord(
-            x, conf.img_size, conf.channels, conf_proj), num_parallel_calls=AUTO)
+            x, conf.img_size_y, conf.img_size_x, conf.channels, conf_proj), num_parallel_calls=AUTO)
     return dataset, n_images
 
 
@@ -76,33 +76,33 @@ def count_tfrecords_items(filenames):
     return np.sum(n)
 
 
-def read_labeled_tfrecord(example, img_size, channels, conf_proj):
+def read_labeled_tfrecord(example, img_size_y, img_size_x, channels, conf_proj):
     LABELED_TFREC_FORMAT = {
         conf_proj.tfrec_img: tf.io.FixedLenFeature([], tf.string), # tf.string means bytestring
         conf_proj.tfrec_class: tf.io.FixedLenFeature([], tf.int64),  # shape [] means single element
     }
     example = tf.io.parse_single_example(example, LABELED_TFREC_FORMAT)
-    image = decode_image(example[conf_proj.tfrec_img], img_size, channels)
+    image = decode_image(example[conf_proj.tfrec_img], img_size_y, img_size_x, channels)
     label = tf.cast(example[conf_proj.tfrec_class], tf.int32)
     return image, label # returns a dataset of (image, label) pairs
 
 
-def read_unlabeled_tfrecord(example, img_size, channels, conf_proj):
+def read_unlabeled_tfrecord(example, img_size_y, img_size_x, channels, conf_proj):
     UNLABELED_TFREC_FORMAT = {
         conf_proj.tfrec_img: tf.io.FixedLenFeature([], tf.string), # tf.string means bytestring
         "id": tf.io.FixedLenFeature([], tf.string),  # shape [] means single element
     }
     example = tf.io.parse_single_example(example, UNLABELED_TFREC_FORMAT)
-    image = decode_image(example[conf_proj.tfrec_img], img_size, channels)
+    image = decode_image(example[conf_proj.tfrec_img], img_size_y, img_size_x, channels)
     idnum = example['id']
     return image, idnum # returns a dataset of image(s)
 
 
-def decode_image(image_data, img_size, channels):
+def decode_image(image_data, img_size_y, img_size_x, channels):
     image = tf.image.decode_jpeg(image_data, channels=channels)
     image = tf.cast(image, tf.float32) / 255.0  # convert image to floats in [0, 1] range
-    image = tf.image.resize(image, size=[*[img_size, img_size]], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-    image = tf.reshape(image, [*[img_size, img_size], channels])
+    image = tf.image.resize(image, size=[*[img_size_y, img_size_x]], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
+    image = tf.reshape(image, [*[img_size_y, img_size_x], channels])
     return image
 
 

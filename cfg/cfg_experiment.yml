@@ -14,7 +14,8 @@ tensorboard: False
 # Data
 batch_size: 32
 channels: 3
-img_size: 224
+img_size_y: 224
+img_size_x: 224
 nb_saved_augmented_img: 16
 
 # CV

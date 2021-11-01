@@ -17,7 +17,7 @@ LOG = c_logging.getLogger(__name__)
 
 def get_base_model(conf):
     # Format inputs
-    inputs = Input(shape=(*[conf.img_size, conf.img_size], conf.channels))
+    inputs = Input(shape=(*[conf.img_size_y, conf.img_size_x], conf.channels))
 
     # Retrieve base model
     base_model, x = define_base(conf, inputs)
@@ -35,131 +35,131 @@ def define_base(conf, inputs):
     if conf.base == "DenseNet121":
         x = densenet.preprocess_input(inputs)
         base_model = DenseNet121(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "DenseNet169":
         x = densenet.preprocess_input(inputs)
         base_model = DenseNet169(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "DenseNet201":
         x = densenet.preprocess_input(inputs)
         base_model = DenseNet201(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "EfficientNetB0":
         x = efficientnet.preprocess_input(inputs)
         base_model = EfficientNetB0(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "EfficientNetB1":
         x = efficientnet.preprocess_input(inputs)
         base_model = EfficientNetB1(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "EfficientNetB2":
         x = efficientnet.preprocess_input(inputs)
         base_model = EfficientNetB2(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "EfficientNetB3":
         x = efficientnet.preprocess_input(inputs)
         base_model = EfficientNetB3(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "EfficientNetB4":
         x = efficientnet.preprocess_input(inputs)
         base_model = EfficientNetB4(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "EfficientNetB5":
         x = efficientnet.preprocess_input(inputs)
         base_model = EfficientNetB5(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "InceptionResNetV2":
         x = inception_resnet_v2.preprocess_input(inputs)
         base_model = InceptionResNetV2(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "InceptionV3":
         x = inception_v3.preprocess_input(inputs)
         base_model = InceptionV3(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "MobileNetV2":
         x = mobilenet_v2.preprocess_input(inputs)
         base_model = MobileNetV2(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "ResNet50V2":
         x = resnet_v2.preprocess_input(inputs)
         base_model = ResNet50V2(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "ResNet101V2":
         x = resnet_v2.preprocess_input(inputs)
         base_model = ResNet101V2(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "ResNet152V2":
         x = resnet_v2.preprocess_input(inputs)
         base_model = ResNet152V2(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "ResNeXT50":
         ResNeXT50, preprocess_input = Classifiers.get('resnext50')
         x = preprocess_input(inputs)
         base_model = ResNeXT50(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "ResNeXT101":
         ResNeXT101, preprocess_input = Classifiers.get('resnext101')
         x = preprocess_input(inputs)
         base_model = ResNeXT101(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "SeResNeXT50":
         SeResNeXT50, preprocess_input = Classifiers.get('seresnext50')
         x = preprocess_input(inputs)
         base_model = SeResNeXT50(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "SeResNeXT101":
         SeResNeXT101, preprocess_input = Classifiers.get('seresnext101')
         x = preprocess_input(inputs)
         base_model = SeResNeXT101(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "VGG16":
         x = vgg16.preprocess_input(inputs)
         base_model = vgg16.VGG16(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     elif conf.base == "Xception":
         x = xception.preprocess_input(inputs)
         base_model = Xception(
-            input_shape=(*[conf.img_size, conf.img_size], conf.channels),
+            input_shape=(*[conf.img_size_y, conf.img_size_x], conf.channels),
             include_top=conf.include_top,
             weights=conf.init_weights)
     else:

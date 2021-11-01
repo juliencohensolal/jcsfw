@@ -29,10 +29,10 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
         if conf.train_centercrop != [0, 0]:
             LOG.info("Applying train_centercrop")
             transforms = alb.Compose([alb.CenterCrop(
-                height=int(conf.img_size - (conf.train_centercrop[0] * conf.img_size / 100)),
-                width=int(conf.img_size - (conf.train_centercrop[0] * conf.img_size / 100)),
+                height=int(conf.img_size_y - (conf.train_centercrop[0] * conf.img_size_y / 100)),
+                width=int(conf.img_size_x - (conf.train_centercrop[0] * conf.img_size_x / 100)),
                 p=conf.train_centercrop[1]),
-                alb.Resize(conf.img_size, conf.img_size)])
+                alb.Resize(conf.img_size_y, conf.img_size_x)])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
         '''if conf.train_clahe != [0, 0, 0]:
@@ -61,7 +61,7 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
                 y_min=conf.train_crop[2],
                 y_max=conf.train_crop[3],
                 p=conf.train_crop[4]),
-                alb.Resize(conf.img_size, conf.img_size)])
+                alb.Resize(conf.img_size_y, conf.img_size_x)])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
         if conf.train_horizontal_flip != 0:
@@ -109,8 +109,8 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
         if conf.train_random_resized_crop != [0, 0, 0]:
             LOG.info("Applying train_random_resized_crop")
             transforms = alb.Compose([alb.RandomResizedCrop(
-                height=conf.img_size,
-                width=conf.img_size,
+                height=conf.img_size_y,
+                width=conf.img_size_x,
                 ratio=(1., 1.),
                 scale=(conf.train_random_resized_crop[0], conf.train_random_resized_crop[1]),
                 p=conf.train_random_resized_crop[2])])
@@ -139,10 +139,10 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
         if conf.test_centercrop != [0, 0]:
             LOG.info("Applying test_centercrop")
             transforms = alb.Compose([alb.CenterCrop(
-                height=int(conf.img_size - (conf.test_centercrop[0] * conf.img_size / 100)),
-                width=int(conf.img_size - (conf.test_centercrop[0] * conf.img_size / 100)),
+                height=int(conf.img_size_y - (conf.test_centercrop[0] * conf.img_size_y / 100)),
+                width=int(conf.img_size_x - (conf.test_centercrop[0] * conf.img_size_x / 100)),
                 p=conf.test_centercrop[1]),
-                alb.Resize(conf.img_size, conf.img_size)])
+                alb.Resize(conf.img_size_y, conf.img_size_x)])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
         '''if conf.test_clahe != [0, 0, 0]:
@@ -171,7 +171,7 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
                 y_min=conf.test_crop[2],
                 y_max=conf.test_crop[3],
                 p=conf.test_crop[4]),
-                alb.Resize(conf.img_size, conf.img_size)])
+                alb.Resize(conf.img_size_y, conf.img_size_x)])
             image = tf.numpy_function(func=alb_aug, inp=[image], Tout=tf.float32)
 
         if conf.test_horizontal_flip != 0:
@@ -219,8 +219,8 @@ def add_augmentations(image, label, conf, conf_proj, is_train=True):
         if conf.test_random_resized_crop != [0, 0, 0]:
             LOG.info("Applying test_random_resized_crop")
             transforms = alb.Compose([alb.RandomResizedCrop(
-                height=conf.img_size,
-                width=conf.img_size,
+                height=conf.img_size_y,
+                width=conf.img_size_x,
                 ratio=(1., 1.),
                 scale=(conf.test_random_resized_crop[0], conf.test_random_resized_crop[1]),
                 p=conf.test_random_resized_crop[2])])
@@ -254,26 +254,26 @@ def add_cutmix(image, label, conf, conf_proj):
         cutwith_img_idx = tf.cast(tf.random.uniform([], 0, conf.batch_size), tf.int32)
 
         # Choose location to cut in image
-        x = tf.cast(tf.random.uniform([], 0, conf.img_size), tf.int32)
-        y = tf.cast(tf.random.uniform([], 0, conf.img_size), tf.int32)
+        x = tf.cast(tf.random.uniform([], 0, conf.img_size_x), tf.int32)
+        y = tf.cast(tf.random.uniform([], 0, conf.img_size_y), tf.int32)
         b = tf.random.uniform([], 0, 1) # this is beta dist with alpha=1.0
-        cutwidth = tf.cast(conf.img_size * tf.math.sqrt(1 - b), tf.int32) * actual_proba
+        cutwidth = tf.cast(conf.img_size_x * tf.math.sqrt(1 - b), tf.int32) * actual_proba
         ya = tf.math.maximum(0, y - cutwidth // 2)
-        yb = tf.math.minimum(conf.img_size, y + cutwidth // 2)
+        yb = tf.math.minimum(conf.img_size_y, y + cutwidth // 2)
         xa = tf.math.maximum(0, x - cutwidth // 2)
-        xb = tf.math.minimum(conf.img_size, x + cutwidth // 2)
+        xb = tf.math.minimum(conf.img_size_x, x + cutwidth // 2)
 
         # Assemble cutmix image
         one = image[j, ya:yb, 0:xa, :]
         two = image[cutwith_img_idx, ya:yb, xa:xb, :]
-        three = image[j, ya:yb, xb:conf.img_size, :]
+        three = image[j, ya:yb, xb:conf.img_size_x, :]
         middle = tf.concat([one, two, three], axis=1)
-        img = tf.concat([image[j, 0:ya, :, :], middle, image[j, yb:conf.img_size,:, :]], axis=0)
+        img = tf.concat([image[j, 0:ya, :, :], middle, image[j, yb:conf.img_size_y,:, :]], axis=0)
         imgs.append(img)
 
         # Update label of cutmix image
         # Warning : labels will be one hot encoded
-        proportion = tf.cast((xb-xa) * (yb-ya) / conf.img_size / conf.img_size, tf.float32)
+        proportion = tf.cast((xb-xa) * (yb-ya) / conf.img_size_y / conf.img_size_x, tf.float32)
         if len(label.shape)==1:
             lab1 = tf.one_hot(label[j], conf_proj.n_classes)
             lab2 = tf.one_hot(label[cutwith_img_idx], conf_proj.n_classes)
@@ -283,7 +283,7 @@ def add_cutmix(image, label, conf, conf_proj):
         labs.append((1 - proportion)*lab1 + proportion*lab2)
 
     # Only useful for TPU? Not sure
-    image2 = tf.reshape(tf.stack(imgs), (conf.batch_size, conf.img_size, conf.img_size, conf.channels))
+    image2 = tf.reshape(tf.stack(imgs), (conf.batch_size, conf.img_size_y, conf.img_size_x, conf.channels))
     label2 = tf.reshape(tf.stack(labs), (conf.batch_size, conf_proj.n_classes))
     return image2, label2
 
@@ -319,6 +319,6 @@ def add_mixup(image, label, conf, conf_proj):
         labs.append((1 - mixwith_intensity)*lab1 + mixwith_intensity*lab2)
 
     # Only useful for TPU? Not sure
-    image2 = tf.reshape(tf.stack(imgs), (conf.batch_size, conf.img_size, conf.img_size, conf.channels))
+    image2 = tf.reshape(tf.stack(imgs), (conf.batch_size, conf.img_size_y, conf.img_size_x, conf.channels))
     label2 = tf.reshape(tf.stack(labs), (conf.batch_size, conf_proj.n_classes))
     return image2, label2
